@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Deck — Growth B2B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f1ea;
+  --ink: #1a1a1a;
+  --paper: #fdfbf6;
+  --accent: #c8410b;
+  --muted: #8a847a;
+  --line: #2a2a2a;
+  --again: #b8392a;
+  --hard:  #b8860b;
+  --good:  #2d5a3d;
+  --easy:  #1e5b8e;
+  --grid: rgba(26,26,26,0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Fraunces', Georgia, serif;
+  background: var(--bg);
+  color: var(--ink);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+textarea, input {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.header {
+  padding: 14px 18px 10px;
+  border-bottom: 1.5px solid var(--line);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.brand {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.brand sup {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--accent);
+  vertical-align: top;
+  margin-left: 4px;
+}
+.edition {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+}
+.tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  border-top: 0.5px solid var(--line);
+  padding-top: 5px;
+}
+.reset-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--ink);
+  color: var(--paper);
+  flex-shrink: 0;
+}
+.stat {
+  padding: 8px 6px;
+  text-align: center;
+  border-right: 1px solid rgba(253,251,246,0.15);
+}
+.stat:last-child { border-right: none; }
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: 0.6;
+  margin-bottom: 2px;
+}
+.stat-value {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+.stat.due .stat-value { color: #e8a468; }
+.stat.new .stat-value { color: #7fb8d4; }
+.stat.mastered .stat-value { color: #7fb88f; }
+
+.categories {
+  padding: 8px 14px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.categories::-webkit-scrollbar { display: none; }
+.cat-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.cat-chip.active { background: var(--ink); color: var(--paper); }
+
+.stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.card {
+  position: absolute;
+  width: calc(100% - 24px);
+  max-width: 420px;
+  height: 100%;
+  max-height: 580px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  box-shadow: 6px 6px 0 var(--ink);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s;
+  transform-style: preserve-3d;
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.card-face.back {
+  transform: rotateY(180deg);
+  background: var(--paper);
+  overflow-y: auto;
+}
+.card.flipped { transform: rotateY(180deg); }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.card-cat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 700;
+}
+.due-badge {
+  padding: 2px 6px;
+  border: 1px solid var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.due-badge.new { color: #2d72a3; border-color: #2d72a3; }
+.due-badge.learning { color: var(--hard); border-color: var(--hard); }
+.due-badge.review { color: var(--good); border-color: var(--good); }
+
+.front-content {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
+  min-height: 0;
+}
+.front-hero {
+  text-align: center;
+  padding: 8px 0 4px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 4px;
+}
+.metric-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.metric-name {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(22px, 6vw, 32px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -1px;
+  font-style: italic;
+}
+.metric-abbr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.front-prompt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.field-group { display: flex; flex-direction: column; gap: 3px; }
+
+.field-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.field-label::before {
+  content: "";
+  width: 8px;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+.field-input {
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--ink);
+  background: rgba(26,26,26,0.03);
+  border: 1px solid var(--line);
+  padding: 7px 9px;
+  resize: none;
+  width: 100%;
+  min-height: 40px;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+  transition: background 0.15s, border-color 0.15s;
+}
+.field-input:focus {
+  background: var(--paper);
+  border-color: var(--accent);
+}
+.field-input.formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+}
+.field-input::placeholder {
+  color: var(--muted);
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.tap-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-align: center;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 0.5px solid var(--line);
+  flex-shrink: 0;
+}
+.tap-hint::before { content: "↻ "; color: var(--accent); }
+
+.your-prev {
+  margin-top: 6px;
+  padding: 5px 8px;
+  background: rgba(26,26,26,0.04);
+  border-left: 2px solid var(--muted);
+  font-family: 'Fraunces', serif;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.3;
+}
+.your-prev-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  font-style: normal;
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.copy-input {
+  margin-top: 6px;
+}
+
+.back-title {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1.5px solid var(--line);
+}
+.back-title-name {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.8px;
+  line-height: 1;
+  color: var(--ink);
+}
+.back-title-abbr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-top: 4px;
+}
+.back-section { margin-bottom: 11px; }
+.back-section:last-of-type { margin-bottom: 0; }
+.back-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.back-label::before {
+  content: "";
+  width: 8px;
+  height: 1.5px;
+  background: var(--accent);
+}
+.back-text {
+  font-family: 'Fraunces', serif;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.back-text.formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 7px 9px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.back-text.example {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.back-text.insight {
+  border-left: 2px solid var(--accent);
+  padding-left: 9px;
+  font-size: 13px;
+}
+.back-text.question {
+  font-style: italic;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.controls {
+  padding: 10px 12px 14px;
+  background: var(--bg);
+  border-top: 1.5px solid var(--line);
+  flex-shrink: 0;
+}
+.controls.hidden { display: none; }
+.controls-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 4px;
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--paper);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+.btn-label { font-size: 10px; font-weight: 700; }
+.btn-interval {
+  font-family: 'Fraunces', serif;
+  font-size: 11px;
+  font-weight: 700;
+  font-style: italic;
+}
+.btn-again { box-shadow: 3px 3px 0 var(--again); }
+.btn-again .btn-interval, .btn-again .btn-label { color: var(--again); }
+.btn-hard { box-shadow: 3px 3px 0 var(--hard); }
+.btn-hard .btn-interval, .btn-hard .btn-label { color: var(--hard); }
+.btn-good { box-shadow: 3px 3px 0 var(--good); }
+.btn-good .btn-interval, .btn-good .btn-label { color: var(--good); }
+.btn-easy { box-shadow: 3px 3px 0 var(--easy); }
+.btn-easy .btn-interval, .btn-easy .btn-label { color: var(--easy); }
+
+.show-answer-row { display: grid; grid-template-columns: 1fr; }
+.btn-show {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 3px 3px 0 var(--accent);
+  padding: 14px;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.btn-show .btn-label { color: var(--paper); font-size: 11px; }
+
+.end-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 28px 24px;
+  text-align: center;
+  width: calc(100% - 24px);
+  max-width: 420px;
+  margin: auto;
+  z-index: 5;
+}
+.end-screen.show { display: flex; }
+.end-title {
+  font-family: 'Fraunces', serif;
+  font-size: 42px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -2px;
+  line-height: 0.9;
+  margin-bottom: 8px;
+}
+.end-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.end-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+  width: 100%;
+}
+.end-stat {
+  padding: 12px 6px;
+  border: 1px solid var(--line);
+}
+.end-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.end-stat-value {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+}
+.end-stat.new .end-stat-value { color: #2d72a3; }
+.end-stat.learning .end-stat-value { color: var(--hard); }
+.end-stat.mature .end-stat-value { color: var(--good); }
+
+.end-msg {
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+.end-next {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.end-next strong { color: var(--accent); }
+
+.end-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.btn-restart {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 13px 24px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-restart.secondary {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+.btn-restart:active { transform: translate(2px, 2px); }
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.mode-banner {
+  background: #b8392a;
+  color: #fdfbf6;
+  padding: 10px 36px 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+  position: relative;
+  border-bottom: 1.5px solid var(--ink);
+  flex-shrink: 0;
+}
+.mode-banner.hidden { display: none; }
+.mode-banner strong {
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 700;
+}
+.mode-banner u { text-underline-offset: 2px; }
+.banner-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #fdfbf6;
+  font-size: 22px;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+}
+.banner-close:hover { opacity: 0.7; }
+
+.card-face::-webkit-scrollbar { width: 4px; }
+.card-face::-webkit-scrollbar-thumb { background: var(--muted); }
+
+@media (min-height: 700px) {
+  .card { max-height: 620px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="brand">KPI<sup>DECK</sup></div>
+    <div class="edition">N°01 · GROWTH B2B</div>
+  </div>
+  <div class="tagline">
+    <span id="storageMode">Storage · checking...</span>
+    <span class="header-actions">
+      <button class="reset-link" id="exportBtn">↓ Export</button>
+      <button class="reset-link" id="importBtn">↑ Import</button>
+      <button class="reset-link" id="resetAll">↻ Reset</button>
+    </span>
+  </div>
+</div>
+
+<div id="modeBanner" class="mode-banner hidden">
+  <strong>Mode démo</strong> — ta progression sera <u>perdue</u> à la fermeture de cet onglet.<br>
+  Télécharge le fichier (… → "Open in new tab" → "Enregistrer") ou exporte régulièrement.
+  <button class="banner-close" id="bannerClose">×</button>
+</div>
+
+<input type="file" id="importFile" accept="application/json" style="display:none;">
+
+<div class="stats">
+  <div class="stat new">
+    <div class="stat-label">Nouveau</div>
+    <div class="stat-value" id="statNew">0</div>
+  </div>
+  <div class="stat due">
+    <div class="stat-label">À réviser</div>
+    <div class="stat-value" id="statDue">0</div>
+  </div>
+  <div class="stat mastered">
+    <div class="stat-label">Maîtrisé</div>
+    <div class="stat-value" id="statMastered">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total</div>
+    <div class="stat-value" id="statTotal">0</div>
+  </div>
+</div>
+
+<div class="categories" id="categories"></div>
+
+<div class="stage" id="stage">
+  <div class="end-screen" id="endScreen">
+    <div class="end-title">Bravo.</div>
+    <div class="end-sub">— Session terminée —</div>
+    <div class="end-stats">
+      <div class="end-stat new">
+        <div class="end-stat-label">Nouveaux</div>
+        <div class="end-stat-value" id="endNew">0</div>
+      </div>
+      <div class="end-stat learning">
+        <div class="end-stat-label">En cours</div>
+        <div class="end-stat-value" id="endLearning">0</div>
+      </div>
+      <div class="end-stat mature">
+        <div class="end-stat-label">Mûrs</div>
+        <div class="end-stat-value" id="endMature">0</div>
+      </div>
+    </div>
+    <div class="end-msg">Reviens plus tard, les cartes te seront représentées au bon moment pour ancrer la mémoire.</div>
+    <div class="end-next" id="endNext"></div>
+    <div class="end-actions">
+      <button class="btn-restart secondary" id="forceReviewBtn">Forcer une session maintenant</button>
+    </div>
+  </div>
+</div>
+
+<div class="controls" id="controls">
+  <div class="show-answer-row" id="showAnswerRow">
+    <button class="btn btn-show" id="btnShow">
+      <span class="btn-label">Afficher la réponse</span>
+    </button>
+  </div>
+  <div class="controls-row" id="gradeRow" style="display:none;">
+    <button class="btn btn-again" data-grade="0">
+      <span class="btn-label">Oublié</span>
+      <span class="btn-interval" id="iAgain">&lt;1m</span>
+    </button>
+    <button class="btn btn-hard" data-grade="1">
+      <span class="btn-label">Galère</span>
+      <span class="btn-interval" id="iHard">10m</span>
+    </button>
+    <button class="btn btn-good" data-grade="2">
+      <span class="btn-label">Bien</span>
+      <span class="btn-interval" id="iGood">1j</span>
+    </button>
+    <button class="btn btn-easy" data-grade="3">
+      <span class="btn-label">Facile</span>
+      <span class="btn-interval" id="iEasy">4j</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  {id:'a1',cat:"Acquisition",name:"Impressions",abbr:"",q:"Quelle est ma visibilité ?",def:"Nombre de fois où un contenu/annonce est affiché",formula:"Σ affichages",example:"50 000 impressions LinkedIn Ads sur 1 mois",insight:"Mesure la portée brute mais ne dit rien sur l'engagement."},
+  {id:'a2',cat:"Acquisition",name:"Reach",abbr:"Portée",q:"Combien de personnes différentes ai-je touchées ?",def:"Nombre d'utilisateurs uniques exposés",formula:"Utilisateurs uniques exposés",example:"12 000 personnes uniques touchées",insight:"Distingue audience réelle vs répétition d'exposition."},
+  {id:'a3',cat:"Acquisition",name:"CTR",abbr:"Click-Through Rate",q:"Mon message accroche-t-il ?",def:"Taux de clic sur une annonce/email",formula:"(Clics / Impressions) × 100",example:"500 clics / 50 000 impressions = 1%",insight:"Qualité du ciblage + pertinence du message créa."},
+  {id:'a4',cat:"Acquisition",name:"CPC",abbr:"Cost Per Click",q:"Combien je paie pour attirer 1 visiteur ?",def:"Coût par clic publicitaire",formula:"Budget / Clics",example:"2 000€ / 500 clics = 4€/clic",insight:"Compétitivité de tes enchères et qualité de tes ads."},
+  {id:'a5',cat:"Acquisition",name:"CPM",abbr:"Cost Per Mille",q:"Combien coûte ma visibilité ?",def:"Coût pour 1 000 impressions",formula:"(Budget / Impressions) × 1 000",example:"2 000€ / 50 000 × 1 000 = 40€",insight:"Pression concurrentielle sur ton audience cible."},
+  {id:'a6',cat:"Acquisition",name:"Sessions",abbr:"Visites",q:"Mon trafic croît-il ?",def:"Nombre de visites sur le site",formula:"Σ sessions GA4",example:"25 000 sessions/mois",insight:"Volume de trafic, à croiser avec la source."},
+  {id:'a7',cat:"Acquisition",name:"Trafic organique",abbr:"",q:"Mon SEO performe-t-il ?",def:"Visites issues du SEO",formula:"Sessions canal organic",example:"8 000 sessions organiques",insight:"Santé SEO et notoriété naturelle."},
+  {id:'a8',cat:"Acquisition",name:"Bounce Rate",abbr:"Taux de rebond",q:"Mon contenu retient-il ?",def:"Taux de visiteurs qui partent sans interagir",formula:"Sessions sans interaction / Total sessions",example:"60% de rebond sur le blog",insight:"Adéquation contenu / intention de recherche."},
+  {id:'c1',cat:"Conversion",name:"Conv. Visiteur → Lead",abbr:"",q:"Mon site convertit-il ?",def:"% de visiteurs devenant leads",formula:"(Leads / Visiteurs) × 100",example:"250 leads / 25 000 visiteurs = 1%",insight:"Performance des CTA, formulaires, landing pages."},
+  {id:'c2',cat:"Conversion",name:"Lead",abbr:"",q:"Combien de prospects je génère ?",def:"Contact ayant laissé ses coordonnées",formula:"Σ formulaires remplis",example:"250 leads/mois",insight:"Volume brut, à qualifier ensuite."},
+  {id:'c3',cat:"Conversion",name:"MQL",abbr:"Marketing Qualified Lead",q:"Combien de leads valent un follow-up ?",def:"Lead qualifié par le marketing (score/critères)",formula:"Σ leads dépassant un seuil de scoring",example:"80 MQL sur 250 leads",insight:"Qualité du ciblage et du nurturing."},
+  {id:'c4',cat:"Conversion",name:"SQL",abbr:"Sales Qualified Lead",q:"Combien méritent un cycle commercial ?",def:"Lead validé par les sales comme opportunité réelle",formula:"Σ MQL acceptés par sales",example:"40 SQL sur 80 MQL",insight:"Alignement marketing/sales et qualité des MQL."},
+  {id:'c5',cat:"Conversion",name:"MQL → SQL Rate",abbr:"",q:"Mes MQL sont-ils vraiment qualifiés ?",def:"Taux de passage MQL à SQL",formula:"(SQL / MQL) × 100",example:"40/80 = 50%",insight:"Si < 30%, problème de définition MQL."},
+  {id:'c6',cat:"Conversion",name:"SAL",abbr:"Sales Accepted Lead",q:"Sales reprend-il bien le flux ?",def:"Lead formellement accepté par sales",formula:"Σ leads acceptés par sales",example:"60 SAL/mois",insight:"Détecte un goulot d'étranglement au handoff."},
+  {id:'c7',cat:"Conversion",name:"Velocity Funnel",abbr:"",q:"Mon funnel est-il fluide ?",def:"Temps moyen de progression dans le funnel",formula:"Σ jours entre étapes / nb leads",example:"14 jours en moyenne",insight:"Frictions dans le parcours."},
+  {id:'c8',cat:"Conversion",name:"CPL",abbr:"Cost Per Lead",q:"Combien coûte 1 prospect ?",def:"Coût d'acquisition d'un lead",formula:"Dépenses marketing / Leads",example:"20 000€ / 250 = 80€",insight:"Efficacité des canaux d'acquisition."},
+  {id:'c9',cat:"Conversion",name:"CPMQL / CPSQL",abbr:"",q:"Combien coûte 1 lead qualifié ?",def:"Coût par MQL ou SQL",formula:"Dépenses / MQL ou SQL",example:"20 000€ / 40 SQL = 500€",insight:"Rentabilité réelle au-delà du volume brut."},
+  {id:'p1',cat:"Pipeline",name:"Opportunités créées",abbr:"",q:"Mon pipeline se remplit-il ?",def:"Nb de deals ouverts dans le CRM",formula:"Σ opportunités créées",example:"30 opportunités/mois",insight:"Santé du top of funnel commercial."},
+  {id:'p2',cat:"Pipeline",name:"Pipeline Coverage",abbr:"",q:"Ai-je assez de pipe pour atteindre mon objectif ?",def:"Ratio pipeline ouvert / quota",formula:"Pipeline value / Quota",example:"1,5M€ / 500K€ = 3x",insight:"Règle classique : viser 3-4x le quota."},
+  {id:'p3',cat:"Pipeline",name:"Pipeline Velocity",abbr:"",q:"À quelle vitesse mon pipe se transforme en CA ?",def:"Vitesse de génération de revenu",formula:"(Nb opps × Win rate × Deal size) / Cycle",example:"(30 × 0,25 × 20K€) / 60j = 2 500€/jour",insight:"Indicateur composite ultra-puissant."},
+  {id:'p4',cat:"Pipeline",name:"Win Rate",abbr:"",q:"Mes sales closent-ils ?",def:"Taux de victoire des deals",formula:"Gagnés / (Gagnés + Perdus) × 100",example:"25 gagnés / 100 closes = 25%",insight:"Qualité du ciblage, du pitch, de la qualification."},
+  {id:'p5',cat:"Pipeline",name:"Loss Rate",abbr:"",q:"Pourquoi je perds ?",def:"Taux de perte des deals",formula:"Deals perdus / Total closes",example:"75%",insight:"À croiser avec les loss reasons."},
+  {id:'p6',cat:"Pipeline",name:"ACV",abbr:"Annual Contract Value",q:"Quelle est la taille moyenne de mes deals ?",def:"Valeur annuelle d'un contrat",formula:"Valeur totale / Durée en années",example:"Contrat 60K€/3 ans = 20K€ ACV",insight:"Permet de comparer deals de durées différentes."},
+  {id:'p7',cat:"Pipeline",name:"Deal Size moyen",abbr:"ASP",q:"Mes deals montent-ils en taille ?",def:"Panier moyen par deal",formula:"CA / Nb deals",example:"500K€ / 25 deals = 20K€",insight:"Mix produit/segment et capacité à monter en gamme."},
+  {id:'p8',cat:"Pipeline",name:"Sales Cycle",abbr:"",q:"Combien de temps pour signer ?",def:"Durée moyenne entre création et closing",formula:"Σ jours / Nb deals gagnés",example:"75 jours",insight:"Friction commerciale, complexité du produit."},
+  {id:'p9',cat:"Pipeline",name:"Quota Attainment",abbr:"",q:"Mes sales tiennent-ils leur quota ?",def:"% d'atteinte de l'objectif",formula:"CA réalisé / Quota × 100",example:"450K€ / 500K€ = 90%",insight:"Performance individuelle et calibrage du quota."},
+  {id:'r1',cat:"Revenue",name:"MRR",abbr:"Monthly Recurring Revenue",q:"Quel est mon CA récurrent ?",def:"Revenu récurrent mensuel",formula:"Σ abonnements mensuels",example:"120 000€ MRR",insight:"Baromètre de santé d'un SaaS."},
+  {id:'r2',cat:"Revenue",name:"ARR",abbr:"Annual Recurring Revenue",q:"Quelle est ma taille en année pleine ?",def:"Revenu récurrent annualisé",formula:"MRR × 12",example:"1,44M€ ARR",insight:"Métrique de référence pour valoriser un SaaS."},
+  {id:'r3',cat:"Revenue",name:"MRR Movements",abbr:"New/Expansion/Churn",q:"D'où vient ma croissance ?",def:"Décomposition du MRR",formula:"New + Expansion − Churn − Downgrade",example:"+15K New, +5K Expansion, -3K Churn",insight:"Compréhension fine des moteurs de croissance."},
+  {id:'r4',cat:"Revenue",name:"NRR",abbr:"Net Revenue Retention",q:"Mes clients existants génèrent-ils plus ?",def:"Rétention nette du revenu sur cohorte",formula:"((MRR0 + Exp − Churn − Down) / MRR0) × 100",example:"110%",insight:"> 100% = croissance même sans new logos. Best : >120%."},
+  {id:'r5',cat:"Revenue",name:"GRR",abbr:"Gross Revenue Retention",q:"Combien je garde de mon revenu existant ?",def:"Rétention brute (sans expansion)",formula:"((MRR0 − Churn − Down) / MRR0) × 100",example:"92%",insight:"Mesure pure de la rétention. Best-in-class : >90%."},
+  {id:'r6',cat:"Revenue",name:"Logo Churn",abbr:"",q:"Je perds combien de clients ?",def:"Taux de perte clients",formula:"Clients perdus / Clients début × 100",example:"5 / 200 = 2,5%/mois",insight:"Stickiness produit et qualité du fit."},
+  {id:'r7',cat:"Revenue",name:"Revenue Churn",abbr:"",q:"Je perds combien de CA ?",def:"Taux de perte de revenu",formula:"MRR perdu / MRR début × 100",example:"3K / 120K = 2,5%",insight:"Plus important que logo churn (gros clients pèsent plus)."},
+  {id:'u1',cat:"Unit Economics",name:"CAC",abbr:"Customer Acquisition Cost",q:"Combien coûte 1 nouveau client ?",def:"Coût d'acquisition d'un client",formula:"(Sales + Marketing) / Nb nouveaux clients",example:"100K€ / 20 clients = 5 000€",insight:"Efficacité globale du go-to-market."},
+  {id:'u2',cat:"Unit Economics",name:"LTV",abbr:"Lifetime Value",q:"Combien me rapporte 1 client au total ?",def:"Valeur vie client",formula:"ARPA × Marge brute / Churn",example:"(1 000€ × 80%) / 5% = 16 000€",insight:"Rentabilité long terme par client."},
+  {id:'u3',cat:"Unit Economics",name:"LTV/CAC",abbr:"",q:"Mon modèle est-il viable ?",def:"Ratio rentabilité acquisition",formula:"LTV / CAC",example:"16 000 / 5 000 = 3,2x",insight:"Objectif : >3x. <1x = on perd de l'argent."},
+  {id:'u4',cat:"Unit Economics",name:"CAC Payback",abbr:"",q:"En combien de mois je récupère mon investissement ?",def:"Temps de rentabilisation du CAC",formula:"CAC / (MRR × Marge brute)",example:"5 000 / (1 000 × 80%) = 6,25 mois",insight:"Best-in-class SaaS B2B : <12 mois."},
+  {id:'u5',cat:"Unit Economics",name:"Magic Number",abbr:"",q:"1€ de S&M génère combien d'ARR ?",def:"Efficacité du Sales & Marketing",formula:"(ΔARR trim × 4) / S&M trim précédent",example:"0,8",insight:">1 = scaler ; <0,5 = revoir l'efficacité."},
+  {id:'u6',cat:"Unit Economics",name:"Burn Multiple",abbr:"",q:"Combien je crame pour grandir ?",def:"Capital brûlé pour chaque € d'ARR",formula:"Net Burn / Net New ARR",example:"1,5",insight:"<1 excellent ; >2 inefficace."},
+  {id:'u7',cat:"Unit Economics",name:"Rule of 40",abbr:"",q:"Mon entreprise est-elle saine ?",def:"Équilibre croissance / rentabilité",formula:"% croissance ARR + % marge EBITDA",example:"50% − 5% = 45%",insight:">40% = bonne santé SaaS."},
+  {id:'t1',cat:"Rétention",name:"Expansion Revenue",abbr:"Upsell Rate",q:"Mes clients grandissent-ils avec moi ?",def:"Revenu additionnel sur base installée",formula:"MRR upsell / MRR total × 100",example:"8%",insight:"Capacité à monétiser la base existante."},
+  {id:'t2',cat:"Rétention",name:"Cross-sell Rate",abbr:"",q:"Mes clients adoptent-ils plus de modules ?",def:"% de clients achetant plusieurs produits",formula:"Clients multi-produits / Total × 100",example:"30%",insight:"Maturité du portefeuille produit."},
+  {id:'t3',cat:"Rétention",name:"NPS",abbr:"Net Promoter Score",q:"Mes clients me recommandent-ils ?",def:"Score de recommandation",formula:"% Promoteurs − % Détracteurs",example:"+45",insight:"Indicateur avancé de churn et de croissance organique."},
+  {id:'t4',cat:"Rétention",name:"Activation Rate",abbr:"",q:"Mes utilisateurs trouvent-ils la valeur ?",def:"% de nouveaux users atteignant l'aha-moment",formula:"Users activés / Users inscrits × 100",example:"40%",insight:"Qualité de l'onboarding, prédicteur de rétention."},
+  {id:'b1',cat:"Attribution",name:"ROAS",abbr:"Return on Ad Spend",q:"Mes ads rapportent-elles ?",def:"Retour sur dépense publicitaire",formula:"Revenu généré / Dépenses pub",example:"30K€ / 10K€ = 3x",insight:"Performance par canal payant."},
+  {id:'b2',cat:"Attribution",name:"ROMI",abbr:"ROI Marketing",q:"Mon marketing rapporte-t-il ?",def:"Retour sur investissement marketing global",formula:"(Revenu − Coût) / Coût × 100",example:"(300K − 100K) / 100K = 200%",insight:"Vue macro de la rentabilité marketing."},
+  {id:'b3',cat:"Attribution",name:"Marketing Sourced Pipe",abbr:"",q:"Quelle est ma contribution au pipe ?",def:"Pipeline issu d'actions marketing",formula:"Σ pipeline attribué au marketing",example:"600K€ / 1,5M total = 40%",insight:"Légitimité du marketing dans la machine revenue."},
+  {id:'b4',cat:"Attribution",name:"Marketing Influenced",abbr:"",q:"Marketing impacte-t-il aussi les deals sales-led ?",def:"Revenu touché par marketing à n'importe quelle étape",formula:"Σ revenu avec touch marketing",example:"70% du CA influencé",insight:"Vue plus large que le \"sourced\"."}
+];
+
+// ============ SM-2 ALGORITHM ============
+const MIN_EASE = 1.30;
+const DEFAULT_EASE = 2.50;
+const LEARNING_STEPS_MIN = [1, 10];
+const GRADUATING_INTERVAL = 1;
+const EASY_INTERVAL = 4;
+const EASY_BONUS = 1.3;
+const HARD_FACTOR = 1.2;
+const MS_MIN = 60 * 1000;
+const MS_DAY = 24 * 60 * 60 * 1000;
+
+function newCardState(id) {
+  return { id, state: 'new', ease: DEFAULT_EASE, interval: 0, dueAt: Date.now(), step: 0, lapses: 0, reps: 0 };
+}
+
+function previewIntervals(c) {
+  if (c.state === 'new' || c.state === 'learning') {
+    const nextStep = c.step + 1;
+    const goodLabel = nextStep >= LEARNING_STEPS_MIN.length
+      ? fmtDay(GRADUATING_INTERVAL)
+      : fmtMin(LEARNING_STEPS_MIN[nextStep]);
+    return {
+      again: '<1m',
+      hard: fmtMin(LEARNING_STEPS_MIN[0]),
+      good: goodLabel,
+      easy: fmtDay(EASY_INTERVAL)
+    };
+  }
+  const hardI = Math.max(c.interval * HARD_FACTOR, c.interval + 1);
+  const goodI = Math.max(c.interval * c.ease, c.interval + 1);
+  const easyI = Math.max(c.interval * c.ease * EASY_BONUS, c.interval + 2);
+  return {
+    again: '<10m',
+    hard: fmtDay(hardI),
+    good: fmtDay(goodI),
+    easy: fmtDay(easyI)
+  };
+}
+
+function fmtMin(m) {
+  if (m < 60) return m + 'm';
+  const h = m / 60;
+  if (h < 24) return Math.round(h) + 'h';
+  return Math.round(h / 24) + 'j';
+}
+function fmtDay(d) {
+  if (d < 1) return Math.round(d * 24 * 60) + 'm';
+  if (d < 30) return Math.round(d) + 'j';
+  if (d < 365) return Math.round(d / 30) + 'mo';
+  return (d / 365).toFixed(1) + 'a';
+}
+
+function applyGrade(c, grade) {
+  const now = Date.now();
+  if (c.state === 'new' || c.state === 'learning') {
+    if (grade === 0) {
+      c.state = 'learning';
+      c.step = 0;
+      c.dueAt = now + LEARNING_STEPS_MIN[0] * MS_MIN;
+    } else if (grade === 1) {
+      c.state = 'learning';
+      c.dueAt = now + LEARNING_STEPS_MIN[Math.min(c.step, LEARNING_STEPS_MIN.length - 1)] * MS_MIN;
+    } else if (grade === 2) {
+      c.step++;
+      if (c.step >= LEARNING_STEPS_MIN.length) {
+        c.state = 'review';
+        c.interval = GRADUATING_INTERVAL;
+        c.dueAt = now + c.interval * MS_DAY;
+      } else {
+        c.state = 'learning';
+        c.dueAt = now + LEARNING_STEPS_MIN[c.step] * MS_MIN;
+      }
+    } else if (grade === 3) {
+      c.state = 'review';
+      c.interval = EASY_INTERVAL;
+      c.dueAt = now + c.interval * MS_DAY;
+    }
+  } else {
+    if (grade === 0) {
+      c.lapses++;
+      c.ease = Math.max(MIN_EASE, c.ease - 0.20);
+      c.state = 'learning';
+      c.step = 0;
+      c.interval = 0;
+      c.dueAt = now + LEARNING_STEPS_MIN[0] * MS_MIN;
+    } else if (grade === 1) {
+      c.ease = Math.max(MIN_EASE, c.ease - 0.15);
+      c.interval = Math.max(c.interval + 1, c.interval * HARD_FACTOR);
+      c.dueAt = now + c.interval * MS_DAY;
+    } else if (grade === 2) {
+      c.interval = Math.max(c.interval + 1, c.interval * c.ease);
+      c.dueAt = now + c.interval * MS_DAY;
+    } else if (grade === 3) {
+      c.ease += 0.15;
+      c.interval = Math.max(c.interval + 2, c.interval * c.ease * EASY_BONUS);
+      c.dueAt = now + c.interval * MS_DAY;
+    }
+  }
+  c.reps++;
+  return c;
+}
+
+// ============ STORAGE ============
+const STORAGE_KEY = 'kpi-deck-srs-v2';
+const storage = (() => {
+  let memCache = {};
+  let useLS = false;
+  try {
+    localStorage.setItem('__t__', '1');
+    // Vérification supplémentaire que c'est bien persisté
+    if (localStorage.getItem('__t__') === '1') {
+      localStorage.removeItem('__t__');
+      useLS = true;
+    }
+  } catch (e) {}
+  return {
+    isPersistent: useLS,
+    get(k) {
+      if (useLS) { try { return localStorage.getItem(k); } catch (e) {} }
+      return memCache[k] || null;
+    },
+    set(k, v) {
+      if (useLS) { try { localStorage.setItem(k, v); return true; } catch (e) {} }
+      memCache[k] = v;
+      return true;
+    },
+    del(k) {
+      if (useLS) { try { localStorage.removeItem(k); } catch (e) {} }
+      delete memCache[k];
+    }
+  };
+})();
+
+// ============ APP STATE ============
+let app = {
+  cards: {},
+  category: 'Tous',
+  current: null,
+  flipped: false,
+  sessionStats: { new: 0, learning: 0, mature: 0 },
+  sessionDate: null,
+  userAnswers: {} // id -> { q, def, formula, insight }
+};
+
+function initCards() {
+  CARDS.forEach(c => {
+    if (!app.cards[c.id]) app.cards[c.id] = newCardState(c.id);
+  });
+}
+
+function save() {
+  storage.set(STORAGE_KEY, JSON.stringify({
+    cards: app.cards,
+    category: app.category,
+    sessionStats: app.sessionStats,
+    sessionDate: new Date().toDateString(),
+    userAnswers: app.userAnswers,
+    savedAt: Date.now()
+  }));
+}
+
+function load() {
+  try {
+    const raw = storage.get(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      app.cards = data.cards || {};
+      app.category = data.category || 'Tous';
+      app.userAnswers = data.userAnswers || {};
+      const today = new Date().toDateString();
+      if (data.sessionDate !== today) {
+        app.sessionStats = { new: 0, learning: 0, mature: 0 };
+      } else {
+        app.sessionStats = data.sessionStats || { new: 0, learning: 0, mature: 0 };
+      }
+      app.sessionDate = today;
+    }
+  } catch (e) { console.error('Load failed', e); }
+  initCards();
+}
+
+function resetAll() {
+  app.cards = {};
+  app.sessionStats = { new: 0, learning: 0, mature: 0 };
+  app.userAnswers = {};
+  initCards();
+  save();
+}
+
+// ============ QUEUE ============
+function eligible() {
+  return CARDS
+    .filter(c => app.category === 'Tous' || c.cat === app.category)
+    .map(c => ({ card: c, st: app.cards[c.id] }));
+}
+
+function pickNext() {
+  const now = Date.now();
+  const all = eligible();
+  const learningDue = all.filter(e => e.st.state === 'learning' && e.st.dueAt <= now)
+    .sort((a, b) => a.st.dueAt - b.st.dueAt);
+  if (learningDue.length) return learningDue[0];
+  const reviewDue = all.filter(e => e.st.state === 'review' && e.st.dueAt <= now)
+    .sort((a, b) => a.st.dueAt - b.st.dueAt);
+  if (reviewDue.length) return reviewDue[0];
+  const newCards = all.filter(e => e.st.state === 'new');
+  if (newCards.length) return newCards[0];
+  const soon = all.filter(e => e.st.state === 'learning')
+    .sort((a, b) => a.st.dueAt - b.st.dueAt);
+  if (soon.length && soon[0].st.dueAt - now < 10 * 60 * 1000) return soon[0];
+  return null;
+}
+
+function countDue() {
+  const now = Date.now();
+  const all = eligible();
+  return {
+    newCount: all.filter(e => e.st.state === 'new').length,
+    // "À réviser" = toutes les cartes en learning (en cours d'apprentissage) + reviews dues
+    dueCount: all.filter(e =>
+      e.st.state === 'learning' ||
+      (e.st.state === 'review' && e.st.dueAt <= now)
+    ).length,
+    masteredCount: all.filter(e => e.st.state === 'review' && e.st.interval >= 21).length,
+    total: all.length
+  };
+}
+
+function nextReviewIn() {
+  const now = Date.now();
+  const all = eligible();
+  const future = all.filter(e => e.st.state !== 'new' && e.st.dueAt > now)
+    .sort((a, b) => a.st.dueAt - b.st.dueAt);
+  if (!future.length) return null;
+  return future[0].st.dueAt - now;
+}
+
+function fmtDuration(ms) {
+  const m = Math.round(ms / 60000);
+  if (m < 1) return 'dans un instant';
+  if (m < 60) return `dans ${m} min`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `dans ${h}h`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `dans ${d} jour${d > 1 ? 's' : ''}`;
+  return `dans ${Math.round(d / 30)} mois`;
+}
+
+// ============ RENDER ============
+const stage = document.getElementById('stage');
+
+function render() {
+  const counts = countDue();
+  document.getElementById('statNew').textContent = counts.newCount;
+  document.getElementById('statDue').textContent = counts.dueCount;
+  document.getElementById('statMastered').textContent = counts.masteredCount;
+  document.getElementById('statTotal').textContent = counts.total;
+
+  stage.querySelectorAll('.card').forEach(c => c.remove());
+
+  const next = pickNext();
+  const endScreen = document.getElementById('endScreen');
+  const controls = document.getElementById('controls');
+
+  if (!next) {
+    endScreen.classList.add('show');
+    controls.classList.add('hidden');
+    document.getElementById('endNew').textContent = app.sessionStats.new;
+    document.getElementById('endLearning').textContent = app.sessionStats.learning;
+    document.getElementById('endMature').textContent = app.sessionStats.mature;
+    const nextMs = nextReviewIn();
+    const endNext = document.getElementById('endNext');
+    if (nextMs !== null) {
+      endNext.innerHTML = `Prochaine révision <strong>${fmtDuration(nextMs)}</strong>`;
+    } else {
+      endNext.innerHTML = `Aucune carte programmée.`;
+    }
+    return;
+  }
+
+  endScreen.classList.remove('show');
+  controls.classList.remove('hidden');
+  app.current = next.card.id;
+  app.flipped = false;
+  buildCard(next.card, next.st);
+  showFront();
+}
+
+function buildCard(card, st) {
+  const stateLabel = st.state === 'new'
+    ? 'Nouveau'
+    : (st.state === 'learning' ? 'Apprentissage' : `Révision · ${fmtDay(st.interval)}`);
+
+  // Structure: { front: {q, example, formula, insight}, back: {q, def, formula, example, insight} }
+  const ans = app.userAnswers[card.id] || {};
+  const front = ans.front || { q: '', example: '', formula: '', insight: '' };
+  const back = ans.back || { q: '', def: '', formula: '', example: '', insight: '' };
+
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `
+    <div class="card-face front">
+      <div class="card-header">
+        <div class="card-cat">${card.cat}</div>
+        <span class="due-badge ${st.state}">${stateLabel}</span>
+      </div>
+      <div class="front-content">
+        <div class="front-hero">
+          <div class="metric-label">— Métrique —</div>
+          <div class="metric-name">${card.name}</div>
+          ${card.abbr ? `<div class="metric-abbr">${card.abbr}</div>` : ''}
+        </div>
+        <div class="front-prompt">Rédige ta réponse, puis vérifie</div>
+
+        <div class="field-group">
+          <div class="field-label">Question à laquelle ça répond</div>
+          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="q" rows="2" placeholder="À quelle question business cette métrique répond-elle ?">${escapeHtml(front.q)}</textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Formule</div>
+          <textarea class="field-input formula" data-card-id="${card.id}" data-face="front" data-field="formula" rows="2" placeholder="Comment se calcule-t-elle ?">${escapeHtml(front.formula)}</textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Exemple chiffré</div>
+          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="example" rows="2" placeholder="Donne un exemple concret avec des chiffres…">${escapeHtml(front.example)}</textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Ce que ça nous apprend</div>
+          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="insight" rows="2" placeholder="Quelle information business ça révèle ?">${escapeHtml(front.insight)}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card-face back">
+      <div class="card-header">
+        <div class="card-cat">${card.cat}</div>
+        <span class="due-badge ${st.state}">${stateLabel}</span>
+      </div>
+      <div class="back-title">
+        <div class="back-title-name">${card.name}</div>
+        ${card.abbr ? `<div class="back-title-abbr">${card.abbr}</div>` : ''}
+      </div>
+
+      <div class="back-section">
+        <div class="back-label">Question</div>
+        <div class="back-text question">${card.q}</div>
+        <textarea class="field-input copy-input" data-card-id="${card.id}" data-face="back" data-field="q" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.q)}</textarea>
+        ${front.q ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.q)}</div>` : ''}
+      </div>
+
+      <div class="back-section">
+        <div class="back-label">Définition</div>
+        <div class="back-text">${card.def}</div>
+        <textarea class="field-input copy-input" data-card-id="${card.id}" data-face="back" data-field="def" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.def)}</textarea>
+        ${front.def ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.def)}</div>` : ''}
+      </div>
+
+      <div class="back-section">
+        <div class="back-label">Formule</div>
+        <div class="back-text formula">${card.formula}</div>
+        <textarea class="field-input copy-input formula" data-card-id="${card.id}" data-face="back" data-field="formula" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.formula)}</textarea>
+        ${front.formula ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.formula)}</div>` : ''}
+      </div>
+
+      <div class="back-section">
+        <div class="back-label">Exemple</div>
+        <div class="back-text example">${card.example}</div>
+        <textarea class="field-input copy-input" data-card-id="${card.id}" data-face="back" data-field="example" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.example)}</textarea>
+        ${front.example ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.example)}</div>` : ''}
+      </div>
+
+      <div class="back-section">
+        <div class="back-label">Ce que ça nous apprend</div>
+        <div class="back-text insight">${card.insight}</div>
+        <textarea class="field-input copy-input" data-card-id="${card.id}" data-face="back" data-field="insight" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.insight)}</textarea>
+        ${front.insight ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.insight)}</div>` : ''}
+      </div>
+    </div>
+  `;
+  stage.appendChild(el);
+
+  // Bind all textareas (front + back)
+  el.querySelectorAll('.field-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const cid = e.target.dataset.cardId;
+      const face = e.target.dataset.face;
+      const field = e.target.dataset.field;
+      if (!app.userAnswers[cid]) app.userAnswers[cid] = { front: {}, back: {} };
+      if (!app.userAnswers[cid][face]) app.userAnswers[cid][face] = {};
+      app.userAnswers[cid][face][field] = e.target.value;
+      save();
+    });
+  });
+
+  const intervals = previewIntervals(st);
+  document.getElementById('iAgain').textContent = intervals.again;
+  document.getElementById('iHard').textContent = intervals.hard;
+  document.getElementById('iGood').textContent = intervals.good;
+  document.getElementById('iEasy').textContent = intervals.easy;
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function flipCard() {
+  const el = stage.querySelector('.card');
+  if (!el) return;
+  app.flipped = true;
+  el.classList.add('flipped');
+  showBack();
+}
+
+function showFront() {
+  document.getElementById('showAnswerRow').style.display = 'grid';
+  document.getElementById('gradeRow').style.display = 'none';
+}
+function showBack() {
+  document.getElementById('showAnswerRow').style.display = 'none';
+  document.getElementById('gradeRow').style.display = 'grid';
+}
+
+function grade(g) {
+  if (!app.current) return;
+  const st = app.cards[app.current];
+  const wasNew = st.state === 'new';
+  const wasInterval = st.interval;
+  applyGrade(st, g);
+  if (wasNew) app.sessionStats.new++;
+  if (st.state === 'learning') app.sessionStats.learning++;
+  if (st.state === 'review' && wasInterval < 21 && st.interval >= 21) app.sessionStats.mature++;
+  // Effacer les réponses utilisateur pour cette carte (prochain passage = nouvelle rédaction)
+  delete app.userAnswers[app.current];
+  save();
+  render();
+}
+
+// ============ CATEGORIES ============
+const CATS = ['Tous', ...new Set(CARDS.map(c => c.cat))];
+const catEl = document.getElementById('categories');
+function buildCategories() {
+  catEl.innerHTML = '';
+  CATS.forEach(cat => {
+    const chip = document.createElement('button');
+    chip.className = 'cat-chip' + (cat === app.category ? ' active' : '');
+    chip.textContent = cat;
+    chip.onclick = () => {
+      app.category = cat;
+      save();
+      buildCategories();
+      render();
+    };
+    catEl.appendChild(chip);
+  });
+}
+
+// ============ BINDINGS ============
+document.getElementById('btnShow').onclick = () => {
+  save();
+  flipCard();
+};
+document.querySelectorAll('[data-grade]').forEach(btn => {
+  btn.onclick = () => grade(parseInt(btn.dataset.grade, 10));
+});
+
+document.getElementById('forceReviewBtn').onclick = () => {
+  const now = Date.now();
+  Object.values(app.cards).forEach(c => {
+    if (c.state !== 'new' && c.dueAt > now) c.dueAt = now;
+  });
+  save();
+  render();
+};
+
+document.getElementById('resetAll').onclick = () => {
+  if (confirm('Réinitialiser toute la progression ?')) {
+    resetAll();
+    render();
+  }
+};
+
+// ============ EXPORT / IMPORT ============
+document.getElementById('exportBtn').onclick = () => {
+  const data = {
+    version: 'kpi-deck-v2',
+    exportedAt: new Date().toISOString(),
+    cards: app.cards,
+    category: app.category,
+    sessionStats: app.sessionStats,
+    sessionDate: app.sessionDate,
+    userAnswers: app.userAnswers
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `kpi-deck-progress-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById('importBtn').onclick = () => {
+  document.getElementById('importFile').click();
+};
+
+document.getElementById('importFile').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.cards) throw new Error('Format invalide');
+      if (!confirm('Importer cette sauvegarde ? Ta progression actuelle sera écrasée.')) return;
+      app.cards = data.cards;
+      app.category = data.category || 'Tous';
+      app.userAnswers = data.userAnswers || {};
+      app.sessionStats = data.sessionStats || { new: 0, learning: 0, mature: 0 };
+      initCards();
+      save();
+      buildCategories();
+      render();
+      alert('Import réussi !');
+    } catch (err) {
+      alert('Erreur d\'import : ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = ''; // reset pour pouvoir réimporter le même fichier
+};
+
+// ============ STORAGE MODE INDICATOR ============
+function updateStorageMode() {
+  const modeEl = document.getElementById('storageMode');
+  const banner = document.getElementById('modeBanner');
+  if (storage.isPersistent) {
+    modeEl.textContent = '● Persistant · SM-2';
+    modeEl.style.color = 'var(--good)';
+    banner.classList.add('hidden');
+  } else {
+    modeEl.textContent = '⚠ Mode démo';
+    modeEl.style.color = '#e8a468';
+    // N'afficher la bannière qu'au premier lancement de la session
+    if (!sessionStorage.getItem('banner-dismissed')) {
+      banner.classList.remove('hidden');
+    }
+  }
+}
+
+document.getElementById('bannerClose').onclick = () => {
+  document.getElementById('modeBanner').classList.add('hidden');
+  try { sessionStorage.setItem('banner-dismissed', '1'); } catch (e) {}
+};
+
+document.addEventListener('keydown', (e) => {
+  if (!app.current) return;
+  // Ne pas intercepter les touches quand on tape dans un champ
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (!app.flipped) {
+    if (e.key === 'Enter') { e.preventDefault(); save(); flipCard(); }
+  } else {
+    if (e.key === '1') grade(0);
+    else if (e.key === '2') grade(1);
+    else if (e.key === '3') grade(2);
+    else if (e.key === '4') grade(3);
+    else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); grade(2); }
+  }
+});
+
+// auto-save
+document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+window.addEventListener('beforeunload', save);
+window.addEventListener('pagehide', save);
+
+// INIT
+updateStorageMode();
+load();
+buildCategories();
+render();
+</script>
+</body>
+</html>

@@ -1113,9 +1113,9 @@ function buildCard(card, st) {
     ? 'Nouveau'
     : (st.state === 'learning' ? 'Apprentissage' : `Révision · ${fmtDay(st.interval)}`);
 
-  // Structure: { front: {q, example, formula, insight}, back: {q, def, formula, example, insight} }
+  // Structure: { front: {formula, insight}, back: {q, def, formula, example, insight} }
   const ans = app.userAnswers[card.id] || {};
-  const front = ans.front || { q: '', example: '', formula: '', insight: '' };
+  const front = ans.front || { formula: '', insight: '' };
   const back = ans.back || { q: '', def: '', formula: '', example: '', insight: '' };
 
   const el = document.createElement('div');
@@ -1135,23 +1135,13 @@ function buildCard(card, st) {
         <div class="front-prompt">Rédige ta réponse, puis vérifie</div>
 
         <div class="field-group">
-          <div class="field-label">Question à laquelle ça répond</div>
-          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="q" rows="2" placeholder="À quelle question business cette métrique répond-elle ?">${escapeHtml(front.q)}</textarea>
-        </div>
-
-        <div class="field-group">
           <div class="field-label">Formule</div>
-          <textarea class="field-input formula" data-card-id="${card.id}" data-face="front" data-field="formula" rows="2" placeholder="Comment se calcule-t-elle ?">${escapeHtml(front.formula)}</textarea>
-        </div>
-
-        <div class="field-group">
-          <div class="field-label">Exemple chiffré</div>
-          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="example" rows="2" placeholder="Donne un exemple concret avec des chiffres…">${escapeHtml(front.example)}</textarea>
+          <textarea class="field-input formula" data-card-id="${card.id}" data-face="front" data-field="formula" rows="3" placeholder="Comment se calcule-t-elle ?">${escapeHtml(front.formula)}</textarea>
         </div>
 
         <div class="field-group">
           <div class="field-label">Ce que ça nous apprend</div>
-          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="insight" rows="2" placeholder="Quelle information business ça révèle ?">${escapeHtml(front.insight)}</textarea>
+          <textarea class="field-input" data-card-id="${card.id}" data-face="front" data-field="insight" rows="3" placeholder="Quelle information business ça révèle ?">${escapeHtml(front.insight)}</textarea>
         </div>
       </div>
     </div>
@@ -1169,7 +1159,6 @@ function buildCard(card, st) {
         <div class="back-label">Question</div>
         <div class="back-text question">${card.q}</div>
         <textarea class="field-input copy-input" data-card-id="${card.id}" data-face="back" data-field="q" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.q)}</textarea>
-        ${front.q ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.q)}</div>` : ''}
       </div>
 
       <div class="back-section">
@@ -1190,7 +1179,6 @@ function buildCard(card, st) {
         <div class="back-label">Exemple</div>
         <div class="back-text example">${card.example}</div>
         <textarea class="field-input copy-input" data-card-id="${card.id}" data-face="back" data-field="example" rows="2" placeholder="Recopie pour ancrer…">${escapeHtml(back.example)}</textarea>
-        ${front.example ? `<div class="your-prev"><span class="your-prev-label">Ta 1re réponse :</span> ${escapeHtml(front.example)}</div>` : ''}
       </div>
 
       <div class="back-section">

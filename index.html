@@ -109,34 +109,35 @@ textarea, input {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: var(--ink);
   color: var(--paper);
   flex-shrink: 0;
 }
 .stat {
-  padding: 8px 6px;
+  padding: 8px 4px;
   text-align: center;
   border-right: 1px solid rgba(253,251,246,0.15);
 }
 .stat:last-child { border-right: none; }
 .stat-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 7.5px;
+  font-size: 7px;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1px;
   opacity: 0.6;
   margin-bottom: 2px;
 }
 .stat-value {
   font-family: 'Fraunces', serif;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1;
 }
 .stat.due .stat-value { color: #e8a468; }
 .stat.new .stat-value { color: #7fb8d4; }
 .stat.mastered .stat-value { color: #7fb88f; }
+.stat.waiting .stat-value { color: #8a847a; }
 
 .categories {
   padding: 8px 14px;
@@ -704,6 +705,10 @@ textarea, input {
     <div class="stat-label">À réviser</div>
     <div class="stat-value" id="statDue">0</div>
   </div>
+  <div class="stat waiting">
+    <div class="stat-label">En attente</div>
+    <div class="stat-value" id="statWaiting">0</div>
+  </div>
   <div class="stat mastered">
     <div class="stat-label">Maîtrisé</div>
     <div class="stat-value" id="statMastered">0</div>
@@ -1043,6 +1048,10 @@ function countDue() {
       e.st.state === 'learning' ||
       (e.st.state === 'review' && e.st.dueAt <= now)
     ).length,
+    // "En attente" = cartes en review dont le prochain timer n'est pas encore écoulé, et qui ne sont pas encore mûres
+    waitingCount: all.filter(e =>
+      e.st.state === 'review' && e.st.dueAt > now && e.st.interval < 21
+    ).length,
     masteredCount: all.filter(e => e.st.state === 'review' && e.st.interval >= 21).length,
     total: all.length
   };
@@ -1075,6 +1084,7 @@ function render() {
   const counts = countDue();
   document.getElementById('statNew').textContent = counts.newCount;
   document.getElementById('statDue').textContent = counts.dueCount;
+  document.getElementById('statWaiting').textContent = counts.waitingCount;
   document.getElementById('statMastered').textContent = counts.masteredCount;
   document.getElementById('statTotal').textContent = counts.total;
 
